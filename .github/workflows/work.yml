@@ -28,8 +28,17 @@ jobs:
     timeout-minutes: 1
     steps:
       - uses: actions/checkout@v2
+      - run: sudo apt-get install -y clang-tidy-12
       - run: clang-tidy-12 --version
       - run: clang-tidy-12 $(find . -name "*.cpp" -or -name "*.h" -print)
+  cppcheck:
+    runs-on: ubuntu-latest
+    timeout-minutes: 1
+    steps:
+      - uses: actions/checkout@v2
+      - run: sudo apt-get install -y cppcheck
+      - run: cppcheck --version
+      - run: cppcheck --language=c++ -DSOME_DEFINE_TO_FIX_CONFIG --enable=all --error-exitcode=1 --inline-suppr $(find . -name '*.cpp')
     
 
 #     # Steps represent a sequence of tasks that will be executed as part of the job
