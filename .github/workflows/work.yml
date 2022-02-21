@@ -21,7 +21,7 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - run: clang-format-12 --version
-      - run: for file in $(find . -name "*.cpp" -or -name "*.c" -or -name ".h"); do diff -u <(cat "$file") <(clang-format "$file") || exit 1; done # TODO: add doctest
+      - run: for file in $(find . -name "*.cpp" -or -name "*.c" -or -name ".h"); do diff -u <(cat "$file") <(clang-format-12 "$file") || exit 1; done # TODO: add doctest
   clang-tidy:
     runs-on: ubuntu-latest
     timeout-minutes: 1
