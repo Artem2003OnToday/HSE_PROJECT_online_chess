@@ -15,7 +15,6 @@ on:
 
 # A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  # This workflow contains a single job called "build"
   clang-format:
     runs-on: ubuntu-latest
     timeout-minutes: 1
@@ -27,14 +26,14 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: muxee/clang-tidy-action@0.0.1-rc1
       - run: clang-tidy-12 --version
       - run: clang-tidy-12 $(find . -name "*.cpp" -or -name "*.h" -print)
   cppcheck:
     runs-on: ubuntu-latest
     timeout-minutes: 1
     steps:
-      - uses: actions/checkout@v2
+      - uses: linuxdeepin/action-cppcheck@v0.0.7
       - run: cppcheck --version
       - run: cppcheck --language=c++ -DSOME_DEFINE_TO_FIX_CONFIG --enable=all --error-exitcode=1 --inline-suppr $(find . -name '*.cpp')
     
