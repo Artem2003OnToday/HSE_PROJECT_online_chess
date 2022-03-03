@@ -30,36 +30,29 @@ jobs:
       - run: sudo apt-get install -y cppcheck
       - run: cppcheck --version
       - run: cppcheck --language=c++ -DSOME_DEFINE_TO_FIX_CONFIG --enable=all --error-exitcode=1 --inline-suppr $(find . -name '*.cpp')
+  build:
+    runs-on: ubuntu-latest
     
+    steps:
+    - uses: actions/checkout@v1
 
-#     # Steps represent a sequence of tasks that will be executed as part of the job
-#     steps:
-#       # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-#       - uses: actions/checkout@v2
+    - name: Mount bazel cache
+      uses: actions/cache@v1
+      with:
+        path: "/home/runner/.cache/bazel"
+        key: bazel
 
-#       - name: Setup C++ environment
-#         # You may pin to the exact commit or the version.
-#         # uses: kurocha/setup-cpp@ef637353b9bec350da9c1088b73d2217d2441696
-#         uses: kurocha/setup-cpp@v1
+    - name: Install bazelisk
+      run: |
+        curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64"
+        mkdir -p "${GITHUB_WORKSPACE}/bin/"
+        mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
+        chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
 
+    - name: Test
+      run: |
+        "${GITHUB_WORKSPACE}/bin/bazel" test //...
 
-#       - name: Mount bazel cache
-#         uses: actions/cache@v1
-#         with:
-#           path: "/home/runner/.cache/bazel"
-#           key: bazel
-
-#       - name: Install bazelisk
-#         run: |
-#           curl -LO "https://github.com/bazelbuild/bazelisk/releases/download/v1.1.0/bazelisk-linux-amd64"
-#           mkdir -p "${GITHUB_WORKSPACE}/bin/"
-#           mv bazelisk-linux-amd64 "${GITHUB_WORKSPACE}/bin/bazel"
-#           chmod +x "${GITHUB_WORKSPACE}/bin/bazel"
-
-#       - name: Test
-#         run: |
-#           "${GITHUB_WORKSPACE}/bin/bazel" test //...
-
-#       - name: Build
-#         run: |
-#           "${GITHUB_WORKSPACE}/bin/bazel" build //...
+    - name: Build
+      run: |
+        "${GITHUB_WORKSPACE}/bin/bazel" build //...
