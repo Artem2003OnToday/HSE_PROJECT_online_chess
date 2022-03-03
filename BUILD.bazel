@@ -1,0 +1,6 @@
+cc_binary(
+    name = "sample",
+    srcs = ["test.cpp",
+    ],
+    visibility = ["//visibility:public"],
+)
