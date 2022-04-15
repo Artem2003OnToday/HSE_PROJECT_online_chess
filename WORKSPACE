@@ -28,5 +28,5 @@ rules_foreign_cc_dependencies()
 
 local_repository(
     name = "sfmllib",
-    path = "third-party/plotingZ/ThirdParty/SFML/",
+    path = "third-party/SFML",
 )
