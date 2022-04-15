@@ -1,11 +1,21 @@
-#include "include/test.h"
-#include <boost/smart_ptr/shared_ptr.hpp>
-#include <iostream>
-
-class A {};
+#include <Graphics.hpp>
 
 int main() {
-  std::cout << test::get_sum(5, 5) << std::endl;
-  boost::shared_ptr<A> pA(new A);
-  std::cout << pA.get() << std::endl;
+  sf::RenderWindow window(sf::VideoMode(200, 200), "SFML works!");
+  sf::CircleShape shape(100.f);
+  shape.setFillColor(sf::Color::Green);
+
+  while (window.isOpen()) {
+    sf::Event event;
+    while (window.pollEvent(event)) {
+      if (event.type == sf::Event::Closed)
+        window.close();
+    }
+
+    window.clear();
+    window.draw(shape);
+    window.display();
+  }
+
+  return 0;
 }
