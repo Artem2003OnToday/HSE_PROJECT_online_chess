@@ -5,7 +5,7 @@ chessboard_square::~chessboard_square() { delete this->figureOnSquare; }
 chessboard_square::chessboard_square(sf::Vector2f coordinates,
                                      std::string file) {
   this->square_coordinate = coordinates;
-  this->squareImage = new sf::Image;
+  this->squareImage = new sf::Image; // NOLINT
   this->squareSprite = new sf::Sprite;
   this->squareTexture = new sf::Texture;
   (*this->squareImage).loadFromFile(file);

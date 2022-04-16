@@ -9,7 +9,7 @@ private:
   sf::Event window_event;
   sf::Vector2i mouse_window_position;
   void initVariable();
-  void initWindow();
+  [[maybe_unused]] void initWindow();
   void initPieces();
   bool chessboardIsOpen = false;
   bool movingPiece = false;
@@ -26,7 +26,7 @@ public:
   void render();
   void pollEvents();
   bool checkIfPiece();
-  int getPickedType();
+  [[maybe_unused]] int getPickedType();
   pieces &getPiece();
   void checkMoves(pieces &piece);
   bool boundChecker(sf::Vector2i coord);

@@ -33,7 +33,7 @@ void chessboard::initVaraible() {
 
 void chessboard::initPieces() {
   // black bishop
-  std::vector<sf::Vector2i> empty;
+  [[maybe_unused]] std::vector<sf::Vector2i> empty;
   std::vector<sf::Vector2i> bishopMoves{
       {1, 1},   {2, 2},   {3, 3},   {4, 4},   {5, 5},   {6, 6},   {7, 7},
       {-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7},
