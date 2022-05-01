@@ -30,7 +30,7 @@ cc_binary(
     name = "server",
     srcs = ["server.cpp"],
     deps = [
-        ":cc_what",
+        ":grpc_what",
         "@com_github_grpc_grpc//:grpc++",
     ],
 )

@@ -25,7 +25,7 @@
 #ifdef BAZEL_BUILD
 #include "examples/protos/helloworld.grpc.pb.h"
 #else
-#include "helloworld.grpc.pb.h"
+#include "what.grpc.pb.h"
 #endif
 
 using grpc::Server;
@@ -71,6 +71,5 @@ void RunServer() {
 
 int main(int argc, char **argv) {
   RunServer();
-
   return 0;
 }
