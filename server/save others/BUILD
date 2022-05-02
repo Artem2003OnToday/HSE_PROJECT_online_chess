@@ -1,20 +1,18 @@
-load("@com_github_grpc_grpc//bazel:cc_grpc_library.bzl", "cc_grpc_library")
+load("@rules_proto_grpc//cpp:defs.bzl", "cpp_grpc_library")
+
+package(default_visibility = ["//visibility:public"])
 
 proto_library(
     name = "what",
     srcs = ["what.proto"],
+    deps = [
+        "@com_google_protobuf//:any_proto",
+    ],
 )
 
-cc_proto_library(
-    name = "cc_what",
-    deps = [":what"],
-)
-
-cc_grpc_library(
+cpp_grpc_library(
     name = "grpc_what",
-    srcs = [":what"],
-    grpc_only = True,
-    deps = [":cc_what"],
+    protos = [":what"],
 )
 
 cc_binary(
@@ -22,7 +20,6 @@ cc_binary(
     srcs = ["client.cpp"],
     deps = [
         ":grpc_what",
-        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
@@ -31,7 +28,6 @@ cc_binary(
     srcs = ["server.cpp"],
     deps = [
         ":grpc_what",
-        "@com_github_grpc_grpc//:grpc++",
     ],
 )
 
