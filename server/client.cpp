@@ -1,93 +1,73 @@
-/*
- *
- * Copyright 2018 gRPC authors.
- *
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
- *
- *     http://www.apache.org/licenses/LICENSE-2.0
- *
- * Unless required by applicable law or agreed to in writing, software
- * distributed under the License is distributed on an "AS IS" BASIS,
- * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
- * See the License for the specific language governing permissions and
- * limitations under the License.
- *
- */
-
+#include <cassert>
 #include <iostream>
 #include <memory>
-#include <string>
+#include <mutex>
+#include <thread>
 
-#include <grpcpp/grpcpp.h>
-
-#ifdef BAZEL_BUILD
-#include "examples/protos/helloworld.grpc.pb.h"
-#else
-#include "thing.grpc.pb.h"
-#endif
+#include <grpc/grpc.h>
+#include <grpcpp/channel.h>
+#include <grpcpp/client_context.h>
+#include <grpcpp/create_channel.h>
+#include <grpcpp/security/credentials.h>
+#include <thing.grpc.pb.h>
 
 using grpc::Channel;
-using grpc::ChannelArguments;
 using grpc::ClientContext;
+using grpc::ClientReaderWriter;
 using grpc::Status;
-using helloworld::Greeter;
-using helloworld::HelloReply;
-using helloworld::HelloRequest;
 
-class GreeterClient {
+StartMessage MakeStartMessage(const std::string &name) {
+  StartMessage m;
+  m.set_name(name);
+  return m;
+}
+
+class RouteGuideClient {
 public:
-  GreeterClient(std::shared_ptr<Channel> channel)
-      : stub_(Greeter::NewStub(channel)) {}
-
-  // Assembles the client's payload, sends it and presents the response back
-  // from the server.
-  std::string SayHello(const std::string &user) {
-    // Data we are sending to the server.
-    HelloRequest request;
-    request.set_name(user);
-
-    // Container for the data we expect from the server.
-    HelloReply reply;
-
-    // Context for the client. It could be used to convey extra information to
-    // the server and/or tweak certain RPC behaviors.
+  RouteGuideClient(std::shared_ptr<Channel> channel)
+      : stub_(RouteGuide::NewStub(channel)) {}
+  void GetIn() {
     ClientContext context;
+    std::shared_ptr<ClientReaderWriter<StartMessage, StartInfo>> stream(
+        stub_->GetIn(&context));
 
-    // Overwrite the call's compression algorithm to DEFLATE.
-    context.set_compression_algorithm(GRPC_COMPRESS_DEFLATE);
+    std::thread writer([stream]() {
+      std::vector<StartMessage> messages{MakeStartMessage("Artemka")};
+      for (const StartMessage &start : messages) {
+        std::cout << "Sending message " << start.name() << std::endl;
+        stream->Write(start);
+      }
+      stream->WritesDone();
+    });
+    StartInfo server_info;
+    while (stream->Read(&server_info)) {
+      std::unique_lock<std::mutex> lock(mu_);
+      std::cout << "Got message " << server_info.id() << ", "
+                << server_info.yourmotion() << std::endl;
+    }
 
-    // The actual RPC.
-    Status status = stub_->SayHello(&context, request, &reply);
-
-    // Act upon its status.
-    if (status.ok()) {
-      return reply.message();
-    } else {
-      std::cout << status.error_code() << ": " << status.error_message()
-                << std::endl;
-      return "RPC failed";
+    std::cerr << "why not??" << std::endl;
+    // [&]() {
+    //   std::unique_lock<std::mutex> lock(mu_);
+    //   std::cerr << "send to server <<Artemka>>" << std::endl;
+    //   stream->Write(MakeStartMessage("Artemka"));
+    //   stream->WritesDone();
+    // }();
+    writer.join();
+    Status status = stream->Finish();
+    if (!status.ok()) {
+      std::cout << "GetIn rpc failed." << std::endl;
     }
   }
 
 private:
-  std::unique_ptr<Greeter::Stub> stub_;
+  std::unique_ptr<RouteGuide::Stub> stub_;
+  std::mutex mu_;
 };
 
 int main(int argc, char **argv) {
-  // Instantiate the client. It requires a channel, out of which the actual RPCs
-  // are created. This channel models a connection to an endpoint (in this case,
-  // localhost at port 50051). We indicate that the channel isn't authenticated
-  // (use of InsecureChannelCredentials()).
-  ChannelArguments args;
-  // Set the default compression algorithm for the channel.
-  args.SetCompressionAlgorithm(GRPC_COMPRESS_GZIP);
-  GreeterClient greeter(grpc::CreateCustomChannel(
-      "localhost:50051", grpc::InsecureChannelCredentials(), args));
-  std::string user("world world world world");
-  std::string reply = greeter.SayHello(user);
-  std::cout << "Greeter received: " << reply << std::endl;
-
+  RouteGuideClient guide(grpc::CreateChannel(
+      "localhost:50051", grpc::InsecureChannelCredentials()));
+  guide.GetIn();
   return 0;
 }
