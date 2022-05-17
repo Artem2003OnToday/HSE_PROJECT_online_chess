@@ -1,29 +1,47 @@
 syntax = "proto3";
 
-service RouteGuide {
-  rpc GetIn(stream StartMessage) returns (stream StartInfo) {}
-  rpc RecordeRoute(stream Point) returns (stream RouteSummary) {}
-  rpc IsAlive(PassMessage) returns (stream Point) {}
+service Game {
+  rpc Auth(AuthRequest) returns (AuthResponse) {}
+  rpc StartGame(StartGameRequest) returns (StartGameResponse) {}
+  rpc SearchGame(SearchGameRequest) returns (SearchGameResponse) {}
+  // rpc MakeTurn(MakeTurnRequest) returns (MakeTurnResponse) {}
+  // rpc IsAlive(PassMessage) returns (Point) {}
 }
 
-message PassMessage {
-  bool stillWaiting = 1;
+message SearchGameRequest {
+  string token = 1;
+}
+message SearchGameResponse {
+  bool search_accept = 1;
+  bool color = 2;
 }
 
-message StartMessage {
-  string name = 1;
+message StartGameRequest {
+  string token = 1;
 }
-message StartInfo {
-  int32 id = 1;
-  bool yourMotion = 2;
+message StartGameResponse {
+  bool right_insert = 1;
 }
 
-message Point {
-  int32 was_string_number = 1;
-  int32 was_column_number = 2;
-  int32 wil_string_number = 3;
-  int32 wil_column_number = 4;
+message AuthRequest {
+  string login = 1;
+  string password = 2;
+  // string ip = 3;
+  string time = 4;
 }
-message RouteSummary {
-  bool isRightMotion = 1;
+message AuthResponse {
+  string token = 1;
 }
+
+// message Point {
+//   int32 was_string_number = 1;
+//   int32 was_column_number = 2;
+//   int32 wil_string_number = 3;
+//   int32 wil_column_number = 4;
+// }
+// message RouteSummary {
+//   bool isRightMotion = 1;
+// }
+// message PassMessage {
+//   bool stillWaiting = 1;
+// }
