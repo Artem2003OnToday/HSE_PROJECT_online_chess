@@ -1,6 +1,8 @@
 #include "include/game/game.h"
+#include <Graphics.hpp>
+#include <iostream>
 
-void test_SFML() {
+void run_gui() {
   game runned_game;
   while (runned_game.isRunning()) {
     runned_game.update();
@@ -8,12 +10,7 @@ void test_SFML() {
   }
 }
 
-void test_gRPC() {
-  
-}
-
 int main() {
-  test_SFML();
-  test_gRPC();
+  run_gui();
   return 0;
 }

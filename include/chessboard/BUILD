@@ -7,8 +7,14 @@ cc_library(
         "chessboard.h",
     ],
     visibility = ["//visibility:public"],
+    # data = [
+    #     "//include/512h:png-files",
+    # ],
     deps = [
         "//include/chessboard_square:chessboard_square",
-        "@sfmllib//:sfml-all",
+        "@sfmllib//:sfml-graphics",
+        "@sfmllib//:sfml-window",
+        "@sfmllib//:sfml-system",
+        # "@sfmllib//:sfml-all",
     ],
 )
