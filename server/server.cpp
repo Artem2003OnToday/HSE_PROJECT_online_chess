@@ -17,7 +17,7 @@ using grpc::ServerContext;
 using grpc::ServerReaderWriter;
 using grpc::Status;
 
-enum BOARD_COLOR { WHITE, BLACK };
+enum { WHITE, BLACK };
 
 std::string get_token(const std::string &ip, const std::string &time) {
   return ip + ":" + time;
@@ -28,10 +28,11 @@ public:
   explicit GameImpl() {}
   Status Auth(ServerContext *context, const AuthRequest *request,
               AuthResponse *response) override { // save login-password
-    // std::cerr << context->peer() << std::endl;
     std::string generate_token = get_token(context->peer(), request->time());
     response->set_token(generate_token);
     users_tokens.insert(generate_token);
+
+    std::cerr << "new user with token = " << response->token() << std::endl;
     return Status::OK;
   }
   Status StartGame(ServerContext *context, const StartGameRequest *request,
@@ -61,6 +62,36 @@ public:
         response->set_color(BLACK);
         response->set_search_accept(false);
       }
+    }
+    return Status::OK;
+  }
+  Status MakeTurn(ServerContext *context, const MakeTurnRequest *request,
+                  MakeTurnResponse *response) override {
+    // for (auto &to : current_game) {
+    //   std::cerr << to.first << ", " << to.second << std::endl;
+    // }
+    std::string token = request->token();
+    if (current_game.count(token)) {
+      std::string other_player_token = current_game[token];
+      // std::cerr << "first token = " << token << "; second token = "
+      //           << other_player_token << std::endl;
+      if (1 == 1) { // correct motion
+        response->set_correct_motion(true);
+        current_game.erase(token);
+        current_game[other_player_token] = token;
+      } else {
+        response->set_correct_motion(false);
+      }
+    }
+    return Status::OK;
+  }
+  Status IsAlive(ServerContext *context, const IsAliveRequest *request,
+                 IsAliveResponse *response) override {
+    std::string token = request->token();
+    if (current_game.count(token)) {
+      response->set_enemy_motion(true);
+    } else {
+      response->set_enemy_motion(false);
     }
     return Status::OK;
   }

@@ -1,5 +1,11 @@
 load("@rules_proto_grpc//cpp:defs.bzl", "cpp_grpc_library", "cpp_proto_library")
 
+# cc_library(
+#     name = "player_info",
+#     srcs = "chess_match.cpp",
+#     hdrs = "chess_match.h",
+# )
+
 proto_library(
     name = "thing_proto",
     srcs = ["thing.proto"],
