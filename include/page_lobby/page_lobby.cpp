@@ -1,4 +1,4 @@
-#include "page_lobby.h"
+#include "include/page_lobby/page_lobby.h"
 #include <iostream>
 
 Page::Page(const sf::RenderWindow &window, std::size_t countOnPage_,
@@ -10,7 +10,7 @@ Page::Page(const sf::RenderWindow &window, std::size_t countOnPage_,
   (*addSession)->setButtonScale(sf::Vector2f(1, 1));
   headButton.setButtonLocation(headCoords);
   usersBox = std::vector<std::unique_ptr<UserLobby *>>();
-  if (!pageNumberFont.loadFromFile(font_path)) {
+  if (!pageNumberFont.loadFromFile("include/512h/" + font_path)) {
     std::cerr << "error load font: [Page constructor]" << std::endl;
   }
 
@@ -178,11 +178,11 @@ void Page::addSessionMenu(sf::RenderWindow &window) {
   // sprite.setPosition(200, 200);
 
   sf::Image ppimage;
-  if (!ppimage.loadFromFile("Levelgreen-min-2.png")) {
+  if (!ppimage.loadFromFile("include/512h/Levelgreen-min-2.png")) {
     std::cerr << "error load jpg/png: [3 - addSessionMenu]" << std::endl;
   }
   sf::Image ppIimage;
-  if (!ppIimage.loadFromFile("Levelgreen-min-3.png")) {
+  if (!ppIimage.loadFromFile("include/512h/Levelgreen-min-3.png")) {
     std::cerr << "error load jpg/png: [4 - addSessionMenu]" << std::endl;
   }
   // Button privateB(&ppIimage, &ppimage, sf::Vector2f(300, 300));
@@ -194,7 +194,7 @@ void Page::addSessionMenu(sf::RenderWindow &window) {
       new Button(&ppIimage, &ppimage, sf::Vector2f(300, 400))));
 
   sf::Font font;
-  font.loadFromFile("font.ttf");
+  font.loadFromFile("include/512h/font.ttf");
 
   sf::RectangleShape rectangle(sf::Vector2f(230, 40));
   rectangle.setPosition(sf::Vector2f(400, 305));
@@ -209,7 +209,7 @@ void Page::addSessionMenu(sf::RenderWindow &window) {
   text.setString(out);
 
   sf::Image okImage;
-  if (!okImage.loadFromFile("OKbutton.png")) {
+  if (!okImage.loadFromFile("include/512h/OKbutton.png")) {
     std::cerr << "error load jpg/png: [5 - addSessionMenu]" << std::endl;
   }
   std::unique_ptr<Button *> okButton = std::make_unique<Button *>(
@@ -217,7 +217,7 @@ void Page::addSessionMenu(sf::RenderWindow &window) {
   (*okButton)->setButtonScale(sf::Vector2f(1.5f, 1.5f));
 
   sf::Image backImage;
-  if (!backImage.loadFromFile("back.jpg")) {
+  if (!backImage.loadFromFile("include/512h/back.jpg")) {
     std::cerr << "error load image 3: [game]" << std::endl;
   }
   sf::Texture backTexture;
@@ -298,17 +298,17 @@ void Page::addSessionMenu(sf::RenderWindow &window) {
 }
 void Page::tryingAddSession(const std::string &login) {
   sf::Image connectImage;
-  if (!connectImage.loadFromFile("Levelgreen-min-2.png")) {
+  if (!connectImage.loadFromFile("include/512h/Levelgreen-min-2.png")) {
     std::cerr << "error load image: [add_user]" << std::endl;
   }
   sf::Image backgroundImage;
-  if (!backgroundImage.loadFromFile("backgroundSession.png")) {
+  if (!backgroundImage.loadFromFile("include/512h/backgroundSession.png")) {
     std::cerr << "error load image 2: [add_user]" << std::endl;
   }
   AddUserBox(std::make_unique<UserLobby *>(
       new UserLobby(login,
                     std::make_unique<Button *>(new Button(
                         &connectImage, &connectImage, sf::Vector2f(0, 0))),
-                    "font.ttf", 24, sf::Color(255, 0, 0), sf::Vector2f(150, 50),
+                    "Afont.ttf", 24, sf::Color(255, 0, 0), sf::Vector2f(150, 50),
                     &backgroundImage)));
 }

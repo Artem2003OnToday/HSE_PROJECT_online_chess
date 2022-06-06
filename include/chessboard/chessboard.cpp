@@ -2,15 +2,15 @@
 #include <climits>
 
 void changeColor(std::string &oldColor) {
-  if (oldColor == "../include/512h/black.png") {
-    oldColor = "white.png";
+  if (oldColor == "include/512h/black.png") {
+    oldColor = "include/512h/white.png";
   } else {
-    oldColor = "../include/512h/black.png";
+    oldColor = "include/512h/black.png";
   }
 }
 
 void chessboard::initBoard() {
-  std::string color = "white.png";
+  std::string color = "include/512h/white.png";
   sf::Vector2f coordinates(100.0, 100.0);
   for (auto &line : this->squares) {
     for (auto &square : line) {
@@ -41,51 +41,63 @@ void chessboard::initPieces() {
       {-1, 1},  {-2, 2},  {-3, 3},  {-4, 4},  {-5, 5},  {-6, 6},  {-7, 7},
   };
   (*this->squares[0][2])
-      .setRealPiece(new pieces(bishopMoves, 3, false, true, "bb.png", 4));
+      .setRealPiece(
+          new pieces(bishopMoves, 3, false, true, "include/512h/bb.png", 4));
   (*this->squares[0][5])
-      .setRealPiece(new pieces(bishopMoves, 3, false, true, "bb.png", 4));
+      .setRealPiece(
+          new pieces(bishopMoves, 3, false, true, "include/512h/bb.png", 4));
 
   // white bishop
   (*this->squares[7][2])
-      .setRealPiece(new pieces(bishopMoves, 3, false, false, "wb.png", 4));
+      .setRealPiece(
+          new pieces(bishopMoves, 3, false, false, "include/512h/wb.png", 4));
   (*this->squares[7][5])
-      .setRealPiece(new pieces(bishopMoves, 3, false, false, "wb.png", 4));
+      .setRealPiece(
+          new pieces(bishopMoves, 3, false, false, "include/512h/wb.png", 4));
 
   // blackPawn
   std::vector<sf::Vector2i> blackPawnMoves{{0, 1}, {0, 2}};
   for (auto &it : this->squares[1]) {
-    (*it).setRealPiece(new pieces(blackPawnMoves, 1, true, true, "bp.png", 1));
+    (*it).setRealPiece(
+        new pieces(blackPawnMoves, 1, true, true, "include/512h/bp.png", 1));
   }
 
   // white pawn
   std::vector<sf::Vector2i> whitePawnMoves{{0, -1}, {0, -2}};
   for (auto &it : this->squares[6]) {
-    (*it).setRealPiece(new pieces(whitePawnMoves, 1, true, false, "wp.png", 1));
+    (*it).setRealPiece(
+        new pieces(whitePawnMoves, 1, true, false, "include/512h/wp.png", 1));
   }
 
   // black king
   std::vector<sf::Vector2i> kingMoves{{1, 0}, {-1, 0},  {0, 1},  {0, -1},
                                       {1, 1}, {-1, -1}, {1, -1}, {-1, 1}};
   (*this->squares[0][4])
-      .setRealPiece(new pieces(kingMoves, INT_MAX, true, true, "bkk.png", 6));
+      .setRealPiece(new pieces(kingMoves, INT_MAX, true, true,
+                               "include/512h/bkk.png", 6));
 
   // white king
   (*this->squares[7][4])
-      .setRealPiece(new pieces(kingMoves, INT_MAX, true, false, "wkk.png", 6));
+      .setRealPiece(new pieces(kingMoves, INT_MAX, true, false,
+                               "include/512h/wkk.png", 6));
 
   // black knight
   std::vector<sf::Vector2i> knightMoves{{1, 2}, {-1, 2}, {1, -2}, {-1, -2},
                                         {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
   (*this->squares[0][1])
-      .setRealPiece(new pieces(knightMoves, 3, false, true, "bk.png", 3));
+      .setRealPiece(
+          new pieces(knightMoves, 3, false, true, "include/512h/bk.png", 3));
   (*this->squares[0][6])
-      .setRealPiece(new pieces(knightMoves, 3, false, true, "bk.png", 3));
+      .setRealPiece(
+          new pieces(knightMoves, 3, false, true, "include/512h/bk.png", 3));
 
   // white khignt
   (*this->squares[7][1])
-      .setRealPiece(new pieces(knightMoves, 3, false, false, "wk.png", 3));
+      .setRealPiece(
+          new pieces(knightMoves, 3, false, false, "include/512h/wk.png", 3));
   (*this->squares[7][6])
-      .setRealPiece(new pieces(knightMoves, 3, false, false, "wk.png", 3));
+      .setRealPiece(
+          new pieces(knightMoves, 3, false, false, "include/512h/wk.png", 3));
 
   // black queen
   std::vector<sf::Vector2i> queenMoves{
@@ -99,28 +111,34 @@ void chessboard::initPieces() {
       {-1, 1},  {-2, 2},  {-3, 3},  {-4, 4},  {-5, 5},  {-6, 6},  {-7, 7},
   };
   (*this->squares[0][3])
-      .setRealPiece(new pieces(queenMoves, 9, false, true, "bq.png", 5));
+      .setRealPiece(
+          new pieces(queenMoves, 9, false, true, "include/512h/bq.png", 5));
 
   // white queen
   (*this->squares[7][3])
-      .setRealPiece(new pieces(queenMoves, 9, false, false, "wq.png", 5));
+      .setRealPiece(
+          new pieces(queenMoves, 9, false, false, "include/512h/wq.png", 5));
 
   // black rook
-  std::vector<sf::Vector2i> rockMoves{
+  std::vector<sf::Vector2i> rookMoves{
       {1, 0},  {2, 0},  {3, 0},  {4, 0},  {5, 0},  {6, 0},  {7, 0},
       {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0}, {-6, 0}, {-7, 0},
       {0, 1},  {0, 2},  {0, 3},  {0, 4},  {0, 5},  {0, 6},  {0, 7},
       {0, -1}, {0, -2}, {0, -3}, {0, -4}, {0, -5}, {0, -6}, {0, -7}};
   (*this->squares[0][0])
-      .setRealPiece(new pieces(rockMoves, 4, true, true, "br.png", 2));
+      .setRealPiece(
+          new pieces(rookMoves, 4, true, true, "include/512h/br.png", 2));
   (*this->squares[0][7])
-      .setRealPiece(new pieces(rockMoves, 4, true, true, "br.png", 2));
+      .setRealPiece(
+          new pieces(rookMoves, 4, true, true, "include/512h/br.png", 2));
 
   // white rook
   (*this->squares[7][0])
-      .setRealPiece(new pieces(rockMoves, 4, true, false, "wr.png", 2));
+      .setRealPiece(
+          new pieces(rookMoves, 4, true, false, "include/512h/wr.png", 2));
   (*this->squares[7][7])
-      .setRealPiece(new pieces(rockMoves, 4, true, false, "wr.png", 2));
+      .setRealPiece(
+          new pieces(rookMoves, 4, true, false, "include/512h/wr.png", 2));
 }
 
 chessboard::chessboard() {
@@ -175,7 +193,11 @@ void chessboard::movePiece(sf::Vector2i oldSquare, sf::Vector2i newSquare) {
 void chessboard::cleanMark() {
   for (auto &line : (this->squares)) {
     for (auto &square : line) {
-      square->cleanMark();
+      square->squareCleanMark();
     }
   }
+}
+
+std::vector<std::vector<chessboard_square *>> &chessboard::getBoard() {
+  return this->squares;
 }

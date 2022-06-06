@@ -18,4 +18,5 @@ public:
   chessboard_square &getSquare(sf::Vector2i coordinates);
   void movePiece(sf::Vector2i oldSquare, sf::Vector2i newSquare);
   void cleanMark();
+  std::vector<std::vector<chessboard_square *>> &getBoard();
 };

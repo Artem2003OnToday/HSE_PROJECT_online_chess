@@ -1,14 +1,14 @@
 cc_library(
-    name = "chessboard",
+    name = "main_menu",
     srcs = [
-        "chessboard.cpp",
+        "main_menu.cpp",
     ],
     hdrs = [
-        "chessboard.h",
+        "main_menu.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//include/chessboard_square:chessboard_square",
+        "//include/start_menu:start_menu",
         "@sfmllib//:sfml-graphics",
         "@sfmllib//:sfml-window",
         "@sfmllib//:sfml-system",

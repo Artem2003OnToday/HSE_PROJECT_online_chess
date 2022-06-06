@@ -1,9 +1,9 @@
 #ifndef PAGE_LOBBY_H_
 #define PAGE_LOBBY_H_
 
-#include "user_lobby.h"
-#include <SFML/Graphics.hpp>
-#include <SFML/Window.hpp>
+#include "include/user_lobby/user_lobby.h"
+#include <Graphics.hpp>
+#include <Window.hpp>
 #include <chrono>
 #include <iostream>
 #include <thread>

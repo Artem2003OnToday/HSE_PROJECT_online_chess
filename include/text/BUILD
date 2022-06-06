@@ -1,16 +1,18 @@
 cc_library(
-    name = "chessboard",
+    name = "text",
     srcs = [
-        "chessboard.cpp",
+        "text.cpp",
     ],
     hdrs = [
-        "chessboard.h",
+        "text.h",
+    ],
+    copts = [
+        "-std=c++17",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//include/chessboard_square:chessboard_square",
         "@sfmllib//:sfml-graphics",
-        "@sfmllib//:sfml-window",
         "@sfmllib//:sfml-system",
+        "@sfmllib//:sfml-window",
     ],
 )

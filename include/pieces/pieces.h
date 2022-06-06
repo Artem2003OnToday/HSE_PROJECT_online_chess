@@ -1,4 +1,5 @@
 #pragma once
+// #include "include/main_menu/main_menu.h"
 #include <Graphics.hpp>
 #include <string>
 #include <vector>
@@ -17,6 +18,7 @@ private:
 public:
   pieces(std::vector<sf::Vector2i> moves, int pieceCost, bool special,
          bool pieceTeam, std::string file, int pieceType);
+  pieces(pieces &anotherPiece);
   ~pieces();
   sf::Sprite &getPieceMadel();
   sf::Sprite &setTexture(const std::string &file);

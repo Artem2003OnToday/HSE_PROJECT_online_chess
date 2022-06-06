@@ -1,7 +1,8 @@
 #ifndef LOBBY_H_
 #define LOBBY_H_
 
-#include "button.h"
+#include "include/button/button.h"
+#include <memory>
 
 class UserLobby {
 private:

@@ -1,14 +1,14 @@
 cc_library(
-    name = "chessboard",
+    name = "piece_upgrade",
     srcs = [
-        "chessboard.cpp",
+        "piece_upgrade.cpp",
     ],
     hdrs = [
-        "chessboard.h",
+        "piece_upgrade.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//include/chessboard_square:chessboard_square",
+        "//include/chessboard:chessboard",
         "@sfmllib//:sfml-graphics",
         "@sfmllib//:sfml-window",
         "@sfmllib//:sfml-system",

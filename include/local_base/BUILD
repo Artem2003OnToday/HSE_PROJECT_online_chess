@@ -1,16 +1,16 @@
 cc_library(
-    name = "chessboard",
+    name = "local_base",
     srcs = [
-        "chessboard.cpp",
+        "local_base.cpp",
     ],
     hdrs = [
-        "chessboard.h",
+        "local_base.h",
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "//include/chessboard_square:chessboard_square",
         "@sfmllib//:sfml-graphics",
         "@sfmllib//:sfml-window",
         "@sfmllib//:sfml-system",
+        "@sqllite3//:sqlite3"
     ],
 )

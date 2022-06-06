@@ -1,4 +1,4 @@
-#include "user_lobby.h"
+#include "include/user_lobby/user_lobby.h"
 #include <iostream>
 
 UserLobby::UserLobby(const std::string &userName,
@@ -8,7 +8,7 @@ UserLobby::UserLobby(const std::string &userName,
                      const sf::Vector2f &textPosition,
                      sf::Image *backgroundImage)
     : userName(userName), startGameButton(std::move(button)) {
-  if (!font.loadFromFile(font_path)) {
+  if (!font.loadFromFile("include/512h/" + font_path)) {
     std::cerr << "error load font: [UserLobby constructor]" << std::endl;
   }
   text.setFont(font);

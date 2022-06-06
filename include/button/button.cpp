@@ -1,4 +1,4 @@
-#include "button.h"
+#include "include/button/button.h"
 #include <iostream>
 
 void Button::initSprite(sf::Sprite *sprite, sf::Texture *texture,

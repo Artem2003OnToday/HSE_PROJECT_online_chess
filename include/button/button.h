@@ -1,7 +1,7 @@
 #ifndef BUTTON_H_
 #define BUTTON_H_
 
-#include <SFML/Graphics.hpp>
+#include <Graphics.hpp>
 
 class Button {
 private:
