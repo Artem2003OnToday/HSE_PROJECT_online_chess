@@ -9,33 +9,30 @@ cc_binary(
         "-std=c++17",
         "-lpqxx",
         "-lpq",
-        "-lglfw",
-        "-lGLEW",
-        "-lGLU",
-        "-lGL",
-        "-lglut",
-        "-lsfml-graphics",
-        "-lsfml-window",
-        "-lsfml-system",
+        # "-lglfw",
+        # "-lGLEW",
+        # "-lGLU",
+        # "-lGL",
+        # "-lglut",
+        # "-lsfml-graphics",
+        # "-lsfml-window",
+        # "-lsfml-system",
+        "-pthread",
+    ],
+    linkopts = [
+        "-pthread",
     ],
     data = [
-        ":bb",
+        "//include/512h:png-files",
     ],
     visibility = ["//visibility:public"],
     deps = [
         "//include/game:game",
+        "//include/page_lobby:page_lobby",
+        "//include/timer:timer",
         "@sfmllib//:sfml-graphics",
         "@sfmllib//:sfml-system",
         "@sfmllib//:sfml-window",
         # "@postgresql//:all_postgresql",
     ],
-)
-
-filegroup(
-    name = "bb",
-    srcs = glob([
-        "*.png",
-        "*.txt"
-    ]),
-    visibility = ["//visibility:public"],
 )
