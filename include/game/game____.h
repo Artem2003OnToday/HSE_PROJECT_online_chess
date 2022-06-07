@@ -1,12 +1,15 @@
 #pragma once
-// #include "include/local_base/local_base.h"
+
+#include "include/chessboard/chessboard.h"
+#include "include/local_base/local_base.h"
 #include "include/main_menu/main_menu.h"
 #include "include/piece_upgrade/piece_upgrade.h"
 #include "include/start_menu/start_menu.h"
 #include "include/timer/timer.h"
 #include "server/client.h"
-#include "sqlite3.h"
+#include <chrono>
 #include <iostream>
+#include <memory>
 
 class game {
 private:
@@ -14,20 +17,22 @@ private:
   start_menu *loginMenu = nullptr;
   main_menu *mainMenu = nullptr;
   chessboard *board = nullptr;
-  //   local_base *userdata = nullptr;
+  local_base *userdata = nullptr;
   sf::Event window_event;
   sf::Vector2i mouse_window_position;
+  void initVariable();
   bool chessboardIsOpen = false;
   bool movingPiece = false;
   sf::Vector2i pickedSquare;
-  bool teamTurn = false;
-  bool myColor = true;
+  int teamTurn = false;
+  int block;
   bool startMenuIsOpened = false;
   bool loginOrPassword = false;
   bool mainMenuIsOpened = false;
   bool kingInTrouble = false;
   int pickingPiece = 0;
-  std::pair<sf::Vector2i, sf::Vector2i> lastTurn;
+  bool swapingKing = false;
+  int color;
   /*
     pretty code starts: Artem
   */
@@ -63,5 +68,7 @@ public:
   sf::Vector2i findBlackKing();
   sf::Vector2i findWhiteKing();
   bool anyMoves();
+
+  void update();
   void initGameClient();
 };

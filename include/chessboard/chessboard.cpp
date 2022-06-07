@@ -1,5 +1,6 @@
-#include "chessboard.h"
+#include "include/chessboard/chessboard.h"
 #include <climits>
+#include <iostream>
 
 void changeColor(std::string &oldColor) {
   if (oldColor == "include/512h/black.png") {

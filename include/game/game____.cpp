@@ -1,5 +1,9 @@
-#include "include/game/game.h"
+#include "game.h"
+#include <iostream>
 
+using pii = std::pair<int, int>;
+
+// Private funcs to initialize game window and board
 void game::initGameClient() {
   std::cerr << "here" << std::endl;
   client = std::make_unique<GameClient *>(new GameClient(grpc::CreateChannel(
@@ -8,11 +12,18 @@ void game::initGameClient() {
   std::cerr << (*client)->current_session_token << std::endl;
 }
 
-game::game() {
+void game::initVariable() {
   this->loginMenu = new start_menu;
   this->startMenuIsOpened = true;
-  //   this->userdata = new local_base;
+  timer1player = std::make_unique<Timer *>(
+      new Timer("button.png", "Afont.ttf", 1000, sf::Vector2f(700, 0)));
+  timer2player = std::make_unique<Timer *>(
+      new Timer("button.png", "Afont.ttf", 1000, sf::Vector2f(700, 900)));
+  time_after_game_starts = std::chrono::steady_clock::now();
 }
+
+// Constructor && destructor
+game::game() { this->initVariable(); }
 
 game::~game() {
   if (this->chessboardIsOpen) {
@@ -24,7 +35,6 @@ game::~game() {
   if (this->startMenuIsOpened) {
     delete this->loginMenu;
   }
-  //   delete this->userdata;
 }
 // check if window is still opened
 const bool game::isRunning(sf::RenderWindow &window) const {
@@ -32,6 +42,7 @@ const bool game::isRunning(sf::RenderWindow &window) const {
 }
 // mouse position setter
 void game::update_mouse_window_positions(sf::RenderWindow &window) {
+  current_time = std::chrono::steady_clock::now();
   this->mouse_window_position = sf::Mouse::getPosition(window);
 }
 // mouse position getter
@@ -46,6 +57,7 @@ void game::update(sf::RenderWindow &window) {
 }
 // drawing a board
 void game::render(sf::RenderWindow &window) {
+  std::cerr << "I'm render" << std::endl;
   window.clear(sf::Color::Black);
   if (this->chessboardIsOpen) {
     current_time = std::chrono::steady_clock::now();
@@ -66,8 +78,11 @@ void game::render(sf::RenderWindow &window) {
       chessboardIsOpen = false;
       // mainMenuIsOpened = true; !!!!!!!!!!!!!!!
     }
+
+    std::cerr << "before renderBoard" << std::endl;
     this->board->renderBoard(window);
     if (this->pickingPiece == 2) {
+      std::cerr << "before renderUpgrade" << std::endl;
       this->pickPiece->renderUpgrade(window);
     }
   }
@@ -77,6 +92,7 @@ void game::render(sf::RenderWindow &window) {
   if (this->mainMenuIsOpened) {
     this->mainMenu->render(window);
   }
+  current_time = std::chrono::steady_clock::now();
   window.display();
 }
 // event getter
@@ -85,32 +101,6 @@ void game::pollEvents(sf::RenderWindow &window) {
     if (this->startMenuIsOpened) {
       this->startMenu(window);
     } else if (this->chessboardIsOpen) {
-      if (this->teamTurn != this->myColor) {
-        std::pair<int, std::pair<pii, pii>> getResponse = (*client)->IsAlive();
-        if (getResponse.first) {
-          std::cerr << "trying move piece: teamTurn = "
-                    << (teamTurn ? "BLACK" : "WHITE") << std::endl;
-          std::cerr << "!" << getResponse.second.first.first << ' '
-                    << getResponse.second.first.second << " - "
-                    << getResponse.second.second.first << " "
-                    << getResponse.second.second.second << std::endl;
-          board->movePiece(sf::Vector2i(getResponse.second.first.first,
-                                        getResponse.second.first.second),
-                           sf::Vector2i(getResponse.second.second.first,
-                                        getResponse.second.second.second));
-          std::cerr << "\t teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
-                    << std::endl;
-          this->teamTurn = !(teamTurn);
-          std::cerr << "\t !!teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
-                    << std::endl;
-        }
-        // if (std::cin >> a) {
-        //   sf::Vector2i newPos, oldPos;
-        //   std::cin >> oldPos.x >> oldPos.y >> newPos.x >> newPos.y;
-        //   this->board->movePiece(oldPos, newPos);
-        //   this->teamTurn = !this->teamTurn;
-        // }
-      }
       this->offlineMode(window);
     } else if (this->mainMenuIsOpened) {
       this->mainMenuActions(window);
@@ -124,6 +114,7 @@ bool game::checkIfPiece(sf::RenderWindow &window) {
 
 int game::getPickedType(sf::RenderWindow &window) {
   return (*this->board)
+
       .getSquare(this->getInGameCoordinates(window))
       .getPieceOnSquare()
       .getPieceType();
@@ -197,154 +188,175 @@ bool game::boundChecker(sf::Vector2i coord) {
 }
 
 void game::offlineMode(sf::RenderWindow &window) {
+  std::pair<int, std::pair<pii, pii>> getResponse = (*client)->IsAlive();
+  if (getResponse.first) {
+    std::cerr << "trying move piece:" << std::endl;
+    std::cerr << getResponse.second.first.first << ' '
+              << getResponse.second.first.second << " - "
+              << getResponse.second.second.first << " "
+              << getResponse.second.second.second << std::endl;
+    if (boundChecker(sf::Vector2i(getResponse.second.first.first,
+                                  getResponse.second.first.second)) &&
+        boundChecker(sf::Vector2i(getResponse.second.second.first,
+                                  getResponse.second.second.second))) {
+      block ^= 1;
+      teamTurn = color;
+      board->movePiece(sf::Vector2i(getResponse.second.first.first,
+                                    getResponse.second.first.second),
+                       sf::Vector2i(getResponse.second.second.first,
+                                    getResponse.second.second.second));
+    }
+    std::cerr << "here" << std::endl;
+  }
+
   switch (this->window_event.type) {
   case sf::Event::Closed:
     window.close();
     break;
   case sf::Event::MouseButtonPressed:
+    std::pair<sf::Vector2i, sf::Vector2i> lastTurn;
     if (this->chessboardIsOpen &&
         this->boundChecker(this->getInGameCoordinates(window))) {
-      if (this->teamTurn == this->myColor)
-        if (this->window_event.key.code == sf::Mouse::Left) {
-          if (this->pickingPiece == 2) {
-            if (this->mouse_window_position.y < 100) {
-              if (this->mouse_window_position.x > 300 &&
-                  this->mouse_window_position.x < 400) {
-                std::vector<sf::Vector2i> rookMoves{
-                    {1, 0},  {2, 0},  {3, 0},  {4, 0},  {5, 0},  {6, 0},
-                    {7, 0},  {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0},
-                    {-6, 0}, {-7, 0}, {0, 1},  {0, 2},  {0, 3},  {0, 4},
-                    {0, 5},  {0, 6},  {0, 7},  {0, -1}, {0, -2}, {0, -3},
-                    {0, -4}, {0, -5}, {0, -6}, {0, -7}};
-                delete &this->board->getSquare(this->pickedSquare)
-                    .getPieceOnSquare();
-                std::string file;
-                if (!this->teamTurn)
-                  file = "include/512h/br.png";
-                else
-                  file = "include/512h/wr.png";
-                this->board->getSquare(this->pickedSquare)
-                    .setRealPiece(new pieces(rookMoves, 4, true,
-                                             !this->teamTurn, file, 2));
-                this->pickingPiece = 0;
-                break;
-              }
-              if (this->mouse_window_position.x > 400 &&
-                  this->mouse_window_position.x < 500) {
-                std::vector<sf::Vector2i> knightMoves{
-                    {1, 2}, {-1, 2}, {1, -2}, {-1, -2},
-                    {2, 1}, {2, -1}, {-2, 1}, {-2, -1}};
-                delete &this->board->getSquare(this->pickedSquare)
-                    .getPieceOnSquare();
-                std::string file;
-                if (!this->teamTurn)
-                  file = "include/512h/bk.png";
-                else
-                  file = "include/512h/wk.png";
-                this->board->getSquare(this->pickedSquare)
-                    .setRealPiece(new pieces(knightMoves, 3, false,
-                                             !this->teamTurn, file, 3));
-                this->pickingPiece = 0;
-                break;
-              }
-              if (this->mouse_window_position.x > 500 &&
-                  this->mouse_window_position.x < 600) {
-                std::vector<sf::Vector2i> bishopMoves{
-                    {1, 1},   {2, 2},   {3, 3},   {4, 4},   {5, 5},   {6, 6},
-                    {7, 7},   {-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5},
-                    {-6, -6}, {-7, -7}, {1, -1},  {2, -2},  {3, -3},  {4, -4},
-                    {5, -5},  {6, -6},  {7, -7},  {-1, 1},  {-2, 2},  {-3, 3},
-                    {-4, 4},  {-5, 5},  {-6, 6},  {-7, 7},
-                };
-                delete &this->board->getSquare(this->pickedSquare)
-                    .getPieceOnSquare();
-                std::string file;
-                if (!this->teamTurn)
-                  file = "include/512h/bb.png";
-                else
-                  file = "include/512h/wb.png";
-                this->board->getSquare(this->pickedSquare)
-                    .setRealPiece(new pieces(bishopMoves, 3, false,
-                                             !this->teamTurn, file, 4));
-                this->pickingPiece = 0;
-                break;
-              }
-              if (this->mouse_window_position.x > 600 &&
-                  this->mouse_window_position.x < 700) {
-                std::vector<sf::Vector2i> queenMoves{
-                    {1, 0},   {2, 0},   {3, 0},   {4, 0},   {5, 0},   {6, 0},
-                    {7, 0},   {-1, 0},  {-2, 0},  {-3, 0},  {-4, 0},  {-5, 0},
-                    {-6, 0},  {-7, 0},  {0, 1},   {0, 2},   {0, 3},   {0, 4},
-                    {0, 5},   {0, 6},   {0, 7},   {0, -1},  {0, -2},  {0, -3},
-                    {0, -4},  {0, -5},  {0, -6},  {0, -7},  {1, 1},   {2, 2},
-                    {3, 3},   {4, 4},   {5, 5},   {6, 6},   {7, 7},   {-1, -1},
-                    {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7},
-                    {1, -1},  {2, -2},  {3, -3},  {4, -4},  {5, -5},  {6, -6},
-                    {7, -7},  {-1, 1},  {-2, 2},  {-3, 3},  {-4, 4},  {-5, 5},
-                    {-6, 6},  {-7, 7},
-                };
-                delete &this->board->getSquare(this->pickedSquare)
-                    .getPieceOnSquare();
-                std::string file;
-                if (!this->teamTurn)
-                  file = "include/512h/bq.png";
-                else
-                  file = "include/512h/wq.png";
-                this->board->getSquare(this->pickedSquare)
-                    .setRealPiece(new pieces(queenMoves, 9, false,
-                                             !this->teamTurn, file, 5));
-                this->pickingPiece = 0;
-                break;
-              }
+      if (this->window_event.key.code == sf::Mouse::Left) {
+        if (this->pickingPiece == 2) {
+          if (this->mouse_window_position.y < 100) {
+            if (this->mouse_window_position.x > 300 &&
+                this->mouse_window_position.x < 400) {
+              std::vector<sf::Vector2i> rookMoves{
+                  {1, 0},  {2, 0},  {3, 0},  {4, 0},  {5, 0},  {6, 0},
+                  {7, 0},  {-1, 0}, {-2, 0}, {-3, 0}, {-4, 0}, {-5, 0},
+                  {-6, 0}, {-7, 0}, {0, 1},  {0, 2},  {0, 3},  {0, 4},
+                  {0, 5},  {0, 6},  {0, 7},  {0, -1}, {0, -2}, {0, -3},
+                  {0, -4}, {0, -5}, {0, -6}, {0, -7}};
+              delete &this->board->getSquare(this->pickedSquare)
+                  .getPieceOnSquare();
+              std::string file;
+              if (!this->teamTurn)
+                file = "include/512h/br.png";
+              else
+                file = "include/512h/wr.png";
+              this->board->getSquare(this->pickedSquare)
+                  .setRealPiece(
+                      new pieces(rookMoves, 4, true, !this->teamTurn, file, 2));
+              this->pickingPiece = 0;
+              break;
             }
-          } else if (!this->movingPiece) {
-            if (this->checkIfPiece(window) &&
-                this->teamTurn == this->getPiece(window)) {
-              this->movingPiece = true;
-              this->pickedSquare = this->getInGameCoordinates(window);
-              this->checkMoves(
-                  this->board->getSquare(this->getInGameCoordinates(window)));
+            if (this->mouse_window_position.x > 400 &&
+                this->mouse_window_position.x < 500) {
+              std::vector<sf::Vector2i> knightMoves{{1, 2},   {-1, 2}, {1, -2},
+                                                    {-1, -2}, {2, 1},  {2, -1},
+                                                    {-2, 1},  {-2, -1}};
+              delete &this->board->getSquare(this->pickedSquare)
+                  .getPieceOnSquare();
+              std::string file;
+              if (!this->teamTurn)
+                file = "include/512h/bk.png";
+              else
+                file = "include/512h/wk.png";
+              this->board->getSquare(this->pickedSquare)
+                  .setRealPiece(new pieces(knightMoves, 3, false,
+                                           !this->teamTurn, file, 3));
+              this->pickingPiece = 0;
+              break;
             }
-          } else {
-            if ((*this->board)
-                        .getSquare(this->getInGameCoordinates(window))
-                        .getMark() != nullptr &&
-                this->getInGameCoordinates(window) != this->pickedSquare &&
-                teamTurn == myColor) {
-              (*this->board)
-                  .movePiece(this->pickedSquare,
-                             this->getInGameCoordinates(window));
-              (*this->board)
-                  .getSquare(this->getInGameCoordinates(window))
-                  .getPieceOnSquare()
-                  .nullSpecial();
-
-              this->teamTurn = !(this->teamTurn);
-              std::cerr << "teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
-                        << std::endl;
-              std::pair<sf::Vector2i, sf::Vector2i> lastTurn = {
-                  pickedSquare, getInGameCoordinates(window)};
+            if (this->mouse_window_position.x > 500 &&
+                this->mouse_window_position.x < 600) {
+              std::vector<sf::Vector2i> bishopMoves{
+                  {1, 1},   {2, 2},   {3, 3},   {4, 4},   {5, 5},   {6, 6},
+                  {7, 7},   {-1, -1}, {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5},
+                  {-6, -6}, {-7, -7}, {1, -1},  {2, -2},  {3, -3},  {4, -4},
+                  {5, -5},  {6, -6},  {7, -7},  {-1, 1},  {-2, 2},  {-3, 3},
+                  {-4, 4},  {-5, 5},  {-6, 6},  {-7, 7},
+              };
+              delete &this->board->getSquare(this->pickedSquare)
+                  .getPieceOnSquare();
+              std::string file;
+              if (!this->teamTurn)
+                file = "include/512h/bb.png";
+              else
+                file = "include/512h/wb.png";
+              this->board->getSquare(this->pickedSquare)
+                  .setRealPiece(new pieces(bishopMoves, 3, false,
+                                           !this->teamTurn, file, 4));
+              this->pickingPiece = 0;
+              break;
+            }
+            if (this->mouse_window_position.x > 600 &&
+                this->mouse_window_position.x < 700) {
+              std::vector<sf::Vector2i> queenMoves{
+                  {1, 0},   {2, 0},   {3, 0},   {4, 0},   {5, 0},   {6, 0},
+                  {7, 0},   {-1, 0},  {-2, 0},  {-3, 0},  {-4, 0},  {-5, 0},
+                  {-6, 0},  {-7, 0},  {0, 1},   {0, 2},   {0, 3},   {0, 4},
+                  {0, 5},   {0, 6},   {0, 7},   {0, -1},  {0, -2},  {0, -3},
+                  {0, -4},  {0, -5},  {0, -6},  {0, -7},  {1, 1},   {2, 2},
+                  {3, 3},   {4, 4},   {5, 5},   {6, 6},   {7, 7},   {-1, -1},
+                  {-2, -2}, {-3, -3}, {-4, -4}, {-5, -5}, {-6, -6}, {-7, -7},
+                  {1, -1},  {2, -2},  {3, -3},  {4, -4},  {5, -5},  {6, -6},
+                  {7, -7},  {-1, 1},  {-2, 2},  {-3, 3},  {-4, 4},  {-5, 5},
+                  {-6, 6},  {-7, 7},
+              };
+              delete &this->board->getSquare(this->pickedSquare)
+                  .getPieceOnSquare();
+              std::string file;
+              if (!this->teamTurn)
+                file = "include/512h/bq.png";
+              else
+                file = "include/512h/wq.png";
+              this->board->getSquare(this->pickedSquare)
+                  .setRealPiece(new pieces(queenMoves, 9, false,
+                                           !this->teamTurn, file, 5));
+              this->pickingPiece = 0;
+              break;
+            }
+          }
+        } else if (!this->movingPiece) {
+          if (this->checkIfPiece(window) &&
+              this->teamTurn == this->getPiece(window)) {
+            this->movingPiece = true;
+            this->pickedSquare = this->getInGameCoordinates(window);
+            this->checkMoves(
+                this->board->getSquare(this->getInGameCoordinates(window)));
+          }
+        } else {
+          if ((*this->board)
+                      .getSquare(this->getInGameCoordinates(window))
+                      .getMark() != nullptr &&
+              this->getInGameCoordinates(window) != this->pickedSquare) {
+            (*this->board)
+                .movePiece(this->pickedSquare,
+                           this->getInGameCoordinates(window));
+            (*this->board)
+                .getSquare(this->getInGameCoordinates(window))
+                .getPieceOnSquare()
+                .nullSpecial();
+            // this->teamTurn = !(this->teamTurn);
+            lastTurn = {pickedSquare, getInGameCoordinates(window)};
+            // while (1) {
+            if (!block) {
+              block ^= 1;
+              // teamTurn = 3;
               (*client)->MakeTurn(lastTurn.first.x, lastTurn.first.y,
                                   lastTurn.second.x, lastTurn.second.y);
-
-              if (this->chessboardIsOpen)
-                (*this->board).cleanMark();
-              if (this->pickingPiece == 1) {
-                this->pickingPiece = 2;
-                this->pickedSquare = this->getInGameCoordinates(window);
-              } else if (!this->anyMoves()) {
-                this->board->cleanMark();
-                this->chessboardIsOpen = false;
-                this->mainMenuIsOpened = true;
-                this->mainMenu = new main_menu;
-                delete this->board;
-              }
             }
+            // }
+
             if (this->chessboardIsOpen)
               (*this->board).cleanMark();
-            this->movingPiece = false;
+            if (this->pickingPiece == 1) {
+              this->pickingPiece = 2;
+              this->pickedSquare = this->getInGameCoordinates(window);
+            } else if (!this->anyMoves()) {
+              this->chessboardIsOpen = false;
+              this->mainMenuIsOpened = true;
+              this->mainMenu = new main_menu;
+              delete this->board;
+            }
           }
+          if (this->chessboardIsOpen)
+            (*this->board).cleanMark();
+          this->movingPiece = false;
         }
+      }
     }
     break;
   }
@@ -976,12 +988,10 @@ void game::startMenu(sf::RenderWindow &window) {
         this->mouse_window_position.x < 175) {
       this->startMenuIsOpened = false;
       this->mainMenuIsOpened = true;
+      delete this->loginMenu;
       window.create(sf::VideoMode(1000, 1000), "Chess project",
                     sf::Style::Close);
       this->mainMenu = new main_menu;
-      //   this->userdata->insertInTable(this->loginMenu->getLoginString(),
-      // this->loginMenu->getPasswordString());
-      delete this->loginMenu;
     }
     break;
   case sf::Event::TextEntered:
@@ -1803,35 +1813,18 @@ void game::mainMenuActions(sf::RenderWindow &window) {
         (*client)->StartGame();
         pii have = (*client)->SearchGame();
         while (!have.first) {
-          //   std::this_thread::sleep_for(std::chrono::milliseconds(5)); NO
-          //   NEED
+          std::this_thread::sleep_for(std::chrono::milliseconds(5));
           have = (*client)->SearchGame();
         }
-
-        // color = have.second;
-        // std::cerr << (color ? "BLACK" : "WHITE") << std::endl;
-        teamTurn = false;
-        myColor = have.second;
-        std::cerr << (myColor ? "BLACK" : "WHITE") << std::endl;
-
-        if (!myColor) {
-          timer1player = std::make_unique<Timer *>(
-              new Timer("button.png", "Afont.ttf", 120, sf::Vector2f(700, 0)));
-          timer2player = std::make_unique<Timer *>(new Timer(
-              "button.png", "Afont.ttf", 120, sf::Vector2f(700, 900)));
-          time_after_game_starts = std::chrono::steady_clock::now();
-        } else {
-          timer2player = std::make_unique<Timer *>(
-              new Timer("button.png", "Afont.ttf", 120, sf::Vector2f(700, 0)));
-          timer1player = std::make_unique<Timer *>(new Timer(
-              "button.png", "Afont.ttf", 120, sf::Vector2f(700, 900)));
-          time_after_game_starts = std::chrono::steady_clock::now();
-        }
-
+        color = have.second;
+        std::cerr << (color ? "BLACK" : "WHITE") << std::endl;
+        teamTurn = have.second;
+        block = have.second;
         this->board = new chessboard;
         this->pickPiece = new piece_upgrade;
       } else if (this->mouse_window_position.y > 310 &&
                  this->mouse_window_position.y < 410) {
+        // settings
       } else if (this->mouse_window_position.y > 420 &&
                  this->mouse_window_position.y < 520) {
         // profile
