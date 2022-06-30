@@ -1,0 +1,55 @@
+syntax = "proto3";
+
+service Game {
+  rpc Auth(AuthRequest) returns (AuthResponse) {}
+  rpc StartGame(StartGameRequest) returns (StartGameResponse) {}
+  rpc SearchGame(SearchGameRequest) returns (SearchGameResponse) {}
+  rpc MakeTurn(MakeTurnRequest) returns (MakeTurnResponse) {}
+  rpc IsAlive(IsAliveRequest) returns (IsAliveResponse) {}
+}
+
+message SearchGameRequest {
+  string token = 1;
+}
+message SearchGameResponse {
+  bool search_accept = 1;
+  bool color = 2;
+}
+
+message StartGameRequest {
+  string token = 1;
+}
+message StartGameResponse {
+  bool right_insert = 1;
+}
+
+message AuthRequest {
+  string login = 1;
+  string password = 2;
+  // string ip = 3;
+  string time = 4;
+}
+message AuthResponse {
+  string token = 1;
+}
+
+message MakeTurnRequest {
+  int32 first_figure_row = 1;
+  int32 first_figure_column = 2;
+  int32 secon_figure_row = 3;
+  int32 secon_figure_column = 4;
+  string token = 5;
+}
+message MakeTurnResponse {
+  bool correct_motion = 1;
+}
+message IsAliveRequest {
+  string token = 1;
+}
+message IsAliveResponse {
+  bool enemy_motion = 1;
+  int32 first_figure_row = 2;
+  int32 first_figure_column = 3;
+  int32 secon_figure_row = 4;
+  int32 secon_figure_column = 5;
+}

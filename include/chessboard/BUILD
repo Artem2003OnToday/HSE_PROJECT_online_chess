@@ -9,6 +9,8 @@ cc_library(
     visibility = ["//visibility:public"],
     deps = [
         "//include/chessboard_square:chessboard_square",
-        "@sfmllib//:sfml-all",
+        "@sfmllib//:sfml-graphics",
+        "@sfmllib//:sfml-window",
+        "@sfmllib//:sfml-system",
     ],
 )

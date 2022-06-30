@@ -1,5 +1,4 @@
 #include "pieces.h"
-
 pieces::~pieces() {
   delete this->pieceImage;
   delete this->pieceSprite;
@@ -15,7 +14,7 @@ sf::Sprite &pieces::setTexture(const std::string &file) {
   (*this->pieceImage).loadFromFile(file);
   (*this->pieceTexture).loadFromImage(*this->pieceImage);
   (*this->pieceSprite).setTexture(*this->pieceTexture);
-  (*this->pieceSprite).setScale(sf::Vector2f(0.18, 0.18));
+  (*this->pieceSprite).setScale(sf::Vector2f(0.18f, 0.18f));
   return *this->pieceSprite;
 }
 

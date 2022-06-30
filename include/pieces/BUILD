@@ -8,6 +8,9 @@ cc_library(
     ],
     visibility = ["//visibility:public"],
     deps = [
-        "@sfmllib//:sfml-all",
+        # "//include/main_menu:main_menu",
+        "@sfmllib//:sfml-graphics",
+        "@sfmllib//:sfml-window",
+        "@sfmllib//:sfml-system",
     ],
 )

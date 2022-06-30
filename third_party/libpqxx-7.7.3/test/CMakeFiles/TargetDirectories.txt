@@ -1,0 +1,4 @@
+/home/god/HSE/course_1/PROJECT_TO_GOOGLE/HSE_PROJECT_online_chess/third_party/libpqxx-7.7.3/test/CMakeFiles/rebuild_cache.dir
+/home/god/HSE/course_1/PROJECT_TO_GOOGLE/HSE_PROJECT_online_chess/third_party/libpqxx-7.7.3/test/CMakeFiles/edit_cache.dir
+/home/god/HSE/course_1/PROJECT_TO_GOOGLE/HSE_PROJECT_online_chess/third_party/libpqxx-7.7.3/test/CMakeFiles/test.dir
+/home/god/HSE/course_1/PROJECT_TO_GOOGLE/HSE_PROJECT_online_chess/third_party/libpqxx-7.7.3/test/CMakeFiles/runner.dir
