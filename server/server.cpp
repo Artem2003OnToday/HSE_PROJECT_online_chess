@@ -75,19 +75,26 @@ public:
       std::string other_player_token = current_game[token];
       std::cerr << "MakeTurn from " << token << " to " << other_player_token
                 << std::endl;
+
+      for (auto to : current_game) {
+        std::cerr << to.first << ' ' << to.second << std::endl;
+      }
       response->set_correct_motion(true);
       current_game.erase(token);
-      current_game[other_player_token] = other_player_token;
+      current_game[other_player_token] = token;
       last_motion[other_player_token] = {
+          // ??
           {request->first_figure_row(), request->first_figure_column()},
           {request->secon_figure_row(), request->secon_figure_column()}};
+    } else {
+      response->set_correct_motion(false);
     }
     return Status::OK;
   }
   Status IsAlive(ServerContext *context, const IsAliveRequest *request,
                  IsAliveResponse *response) override {
     std::string token = request->token();
-    std::cerr << "IsAlive for " << token << std::endl;
+    // std::cerr << "IsAlive for " << token << std::endl;
     if (last_motion.count(token)) {
       response->set_enemy_motion(true);
       std::pair<std::pair<int, int>, std::pair<int, int>> turn =

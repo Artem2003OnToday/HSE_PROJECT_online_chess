@@ -103,10 +103,10 @@ public:
     /*
     return enemy motion or mark it on border here...
     */
-    std::cerr << response.first_figure_row() << " "
-              << response.first_figure_column() << " - "
-              << response.secon_figure_row() << " "
-              << response.secon_figure_column() << std::endl;
+    // std::cerr << response.first_figure_row() << " "
+    //           << response.first_figure_column() << " - "
+    //           << response.secon_figure_row() << " "
+    //           << response.secon_figure_column() << std::endl;
     return {response.enemy_motion(),
             {{response.first_figure_row(), response.first_figure_column()},
              {response.secon_figure_row(), response.secon_figure_column()}}};

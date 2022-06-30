@@ -63,6 +63,7 @@ void run_Artem_gui() {
 
 void run_Kirill_gui() {
   sf::RenderWindow window(sf::VideoMode(WIDTH, HEIGHT), "chess");
+  window.setActive();
   game runned_game;
   while (runned_game.isRunning(window)) {
     runned_game.render(window);

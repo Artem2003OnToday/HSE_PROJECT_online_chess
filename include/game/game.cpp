@@ -1,11 +1,11 @@
 #include "include/game/game.h"
 
 void game::initGameClient() {
-  std::cerr << "here" << std::endl;
+  //   std::cerr << "here" << std::endl;
   client = std::make_unique<GameClient *>(new GameClient(grpc::CreateChannel(
       "localhost:50051", grpc::InsecureChannelCredentials())));
   (*client)->current_session_token = (*client)->Auth("login", "password");
-  std::cerr << (*client)->current_session_token << std::endl;
+  //   std::cerr << (*client)->current_session_token << std::endl;
 }
 
 game::game() {
@@ -47,6 +47,7 @@ void game::update(sf::RenderWindow &window) {
 // drawing a board
 void game::render(sf::RenderWindow &window) {
   window.clear(sf::Color::Black);
+  // window.draw(textName);
   if (this->chessboardIsOpen) {
     current_time = std::chrono::steady_clock::now();
     if (std::chrono::duration_cast<std::chrono::seconds>(current_time -
@@ -88,28 +89,12 @@ void game::pollEvents(sf::RenderWindow &window) {
       if (this->teamTurn != this->myColor) {
         std::pair<int, std::pair<pii, pii>> getResponse = (*client)->IsAlive();
         if (getResponse.first) {
-          std::cerr << "trying move piece: teamTurn = "
-                    << (teamTurn ? "BLACK" : "WHITE") << std::endl;
-          std::cerr << "!" << getResponse.second.first.first << ' '
-                    << getResponse.second.first.second << " - "
-                    << getResponse.second.second.first << " "
-                    << getResponse.second.second.second << std::endl;
           board->movePiece(sf::Vector2i(getResponse.second.first.first,
                                         getResponse.second.first.second),
                            sf::Vector2i(getResponse.second.second.first,
                                         getResponse.second.second.second));
-          std::cerr << "\t teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
-                    << std::endl;
           this->teamTurn = !(teamTurn);
-          std::cerr << "\t !!teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
-                    << std::endl;
         }
-        // if (std::cin >> a) {
-        //   sf::Vector2i newPos, oldPos;
-        //   std::cin >> oldPos.x >> oldPos.y >> newPos.x >> newPos.y;
-        //   this->board->movePiece(oldPos, newPos);
-        //   this->teamTurn = !this->teamTurn;
-        // }
       }
       this->offlineMode(window);
     } else if (this->mainMenuIsOpened) {
@@ -320,8 +305,8 @@ void game::offlineMode(sf::RenderWindow &window) {
                   .nullSpecial();
 
               this->teamTurn = !(this->teamTurn);
-              std::cerr << "teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
-                        << std::endl;
+              //   std::cerr << "teamTurn = " << (teamTurn ? "BLACK" : "WHITE")
+              //             << std::endl;
               std::pair<sf::Vector2i, sf::Vector2i> lastTurn = {
                   pickedSquare, getInGameCoordinates(window)};
               (*client)->MakeTurn(lastTurn.first.x, lastTurn.first.y,
@@ -1812,7 +1797,7 @@ void game::mainMenuActions(sf::RenderWindow &window) {
         // std::cerr << (color ? "BLACK" : "WHITE") << std::endl;
         teamTurn = false;
         myColor = have.second;
-        std::cerr << (myColor ? "BLACK" : "WHITE") << std::endl;
+        // std::cerr << (myColor ? "BLACK" : "WHITE") << std::endl;
 
         if (!myColor) {
           timer1player = std::make_unique<Timer *>(
@@ -1827,6 +1812,17 @@ void game::mainMenuActions(sf::RenderWindow &window) {
               "button.png", "Afont.ttf", 120, sf::Vector2f(700, 900)));
           time_after_game_starts = std::chrono::steady_clock::now();
         }
+
+        // fontName.loadFromFile("include/512h/Afont.ttf");
+        // textName.setFont(fontName);
+        // if (myColor) {
+        //   textName.setString("Artem");
+        // } else {
+        //   textName.setString("Kirill");
+        // }
+        // textName.setCharacterSize(40);
+        // textName.setFillColor(sf::Color(0, 0, 255));
+        // textName.setPosition(30, 30);
 
         this->board = new chessboard;
         this->pickPiece = new piece_upgrade;
